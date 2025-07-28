@@ -69,6 +69,15 @@ async function loadVentas() {
         if (data.success) {
             ventasData = data.ventas;
             filteredData = [...ventasData];
+            
+            // Debug: Log de los datos recibidos
+            console.log('📊 Datos de ventas recibidos:', ventasData);
+            if (ventasData.length > 0) {
+                console.log('🔍 Primera venta:', ventasData[0]);
+                console.log('📅 Fecha de primera venta:', ventasData[0].fechaVenta);
+                console.log('📋 Folio de primera venta:', ventasData[0].folio);
+            }
+            
             updateStats();
             renderVentas();
         } else {
@@ -135,31 +144,42 @@ function renderVentas() {
         return;
     }
     
-    salesTableBody.innerHTML = filteredData.map(venta => `
-        <tr>
-            <td>${formatDate(venta.fechaVenta)}</td>
-            <td><strong>#${venta.folio}</strong></td>
-            <td>
-                <div>
-                    <strong>${venta.clienteNombre}</strong><br>
-                    <small style="color: #666;">${venta.clienteRut}</small>
-                </div>
-            </td>
-            <td><strong>${formatCurrency(venta.totalVenta)}</strong></td>
-            <td>${venta.totalCantidad} items</td>
-            <td>${venta.usuario}</td>
-            <td>
-                <div class="action-buttons">
-                    <button class="btn btn-info btn-small" onclick="showVentaDetail('${venta.$id}')">
-                        <i class="fas fa-eye"></i> Ver
-                    </button>
-                    <button class="btn btn-danger btn-small" onclick="deleteVenta('${venta.$id}', '${venta.folio}')">
-                        <i class="fas fa-trash"></i> Eliminar
-                    </button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    salesTableBody.innerHTML = filteredData.map(venta => {
+        // Debug: Log de cada venta
+        console.log('🔍 Procesando venta:', {
+            id: venta.$id,
+            fecha: venta.fechaVenta,
+            folio: venta.folio,
+            cliente: venta.clienteNombre,
+            total: venta.totalVenta
+        });
+        
+        return `
+            <tr>
+                <td>${formatDate(venta.fechaVenta)}</td>
+                <td><strong>#${venta.folio || 'N/A'}</strong></td>
+                <td>
+                    <div>
+                        <strong>${venta.clienteNombre || 'Cliente'}</strong><br>
+                        <small style="color: #666;">${venta.clienteRut || 'N/A'}</small>
+                    </div>
+                </td>
+                <td><strong>${formatCurrency(venta.totalVenta || 0)}</strong></td>
+                <td>${venta.totalCantidad || 0} items</td>
+                <td>${venta.usuario || 'Usuario'}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-info btn-small" onclick="showVentaDetail('${venta.$id}')">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                        <button class="btn btn-danger btn-small" onclick="deleteVenta('${venta.$id}', '${venta.folio || 'N/A'}')">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function filterVentas() {
@@ -362,19 +382,37 @@ function formatCurrency(amount) {
 }
 
 function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString('es-CL', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+    try {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'N/A';
+        
+        return date.toLocaleDateString('es-CL', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    } catch (error) {
+        console.error('Error formateando fecha:', dateString, error);
+        return 'N/A';
+    }
 }
 
 function formatDateTime(dateString) {
-    return new Date(dateString).toLocaleString('es-CL', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    try {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'N/A';
+        
+        return date.toLocaleString('es-CL', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (error) {
+        console.error('Error formateando fecha/hora:', dateString, error);
+        return 'N/A';
+    }
 }
