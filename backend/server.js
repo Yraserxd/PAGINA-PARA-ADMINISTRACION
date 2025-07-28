@@ -52,8 +52,10 @@ app.post('/webhook/venta', async (req, res) => {
         console.log('🔍 Campos disponibles en ventaData:');
         console.log('fechaVentaVnt:', ventaData.fechaVentaVnt);
         console.log('folioDoc:', ventaData.folioDoc);
+        console.log('folio:', ventaData.folio);
         console.log('nombreClienteVnt:', ventaData.nombreClienteVnt);
         console.log('totalVentaVnt:', ventaData.totalVentaVnt);
+        console.log('Todos los campos:', Object.keys(ventaData));
         
         // Preparar datos para Appwrite con validación
         const ventaDocument = {
@@ -69,7 +71,7 @@ app.post('/webhook/venta', async (req, res) => {
             clienteRut: ventaData.rutClienteVnt || ventaData.clienteRut || 'N/A',
             clienteNombre: ventaData.nombreClienteVnt || ventaData.clienteNombre || 'Cliente',
             usuario: ventaData.nombreUsuarioAppEmpPos || ventaData.usuario || 'Usuario',
-            folio: ventaData.folioDoc || ventaData.folio || 0,
+            folio: ventaData.folioDoc || ventaData.folio || ventaData.numeroFolio || ventaData.numeroDocumento || 0,
             token: ventaData.tokenVnt || ventaData.token || 'N/A',
             detalles: JSON.stringify(ventaData.detalles || []),
             ingresos: JSON.stringify(ventaData.ingresos || []),
@@ -170,6 +172,58 @@ app.get('/', (req, res) => {
             deleteVenta: '/api/ventas/:id'
         }
     });
+});
+
+// Endpoint para crear datos de prueba
+app.post('/api/test-data', async (req, res) => {
+    try {
+        const testVenta = {
+            ventaId: 12345,
+            empresaId: 1,
+            sucursalId: 1,
+            fechaVenta: new Date(),
+            totalVenta: 25000,
+            totalCantidad: 3,
+            pagoRecibido: 25000,
+            totalNeto: 21008,
+            totalDescuento: 0,
+            clienteRut: '12345678-9',
+            clienteNombre: 'Cliente de Prueba',
+            usuario: 'Usuario Sistema',
+            folio: 1001,
+            token: 'test-token-123',
+            detalles: JSON.stringify([
+                {
+                    skuDtv: 'SKU001',
+                    nombreProductoDtv: 'Producto 1',
+                    cantidadProductoDtv: 2,
+                    precioProductoDtv: 10000,
+                    totalProductoDtv: 20000
+                }
+            ]),
+            ingresos: JSON.stringify([
+                {
+                    glosaInv: 'Efectivo',
+                    montoInv: 25000
+                }
+            ]),
+            dteReceptor: JSON.stringify({}),
+            rawData: JSON.stringify({})
+        };
+
+        const result = await databases.createDocument(
+            process.env.APPWRITE_DATABASE_ID,
+            process.env.APPWRITE_COLLECTION_VENTAS_ID,
+            ID.unique(),
+            testVenta
+        );
+
+        res.json({ success: true, documentId: result.$id, message: 'Datos de prueba creados' });
+
+    } catch (error) {
+        console.error('❌ Error creando datos de prueba:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
 });
 
 app.listen(PORT, () => {
