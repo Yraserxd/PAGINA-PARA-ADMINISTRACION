@@ -76,6 +76,8 @@ async function loadVentas() {
                 console.log('🔍 Primera venta:', ventasData[0]);
                 console.log('📅 Fecha de primera venta:', ventasData[0].fechaVenta);
                 console.log('📋 Folio de primera venta:', ventasData[0].folio);
+                console.log('👤 Cliente de primera venta:', ventasData[0].clienteNombre);
+                console.log('💰 Total de primera venta:', ventasData[0].totalVenta);
             }
             
             updateStats();
@@ -156,7 +158,7 @@ function renderVentas() {
         
         return `
             <tr>
-                <td>${formatDate(venta.fechaVenta)}</td>
+                <td>${formatDateTime(venta.fechaVenta)}</td>
                 <td><strong>#${venta.folio || 'N/A'}</strong></td>
                 <td>
                     <div>

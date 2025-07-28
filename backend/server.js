@@ -17,12 +17,12 @@ const requiredEnvVars = [
 const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingVars.length > 0) {
-    console.error('❌ Variables de entorno faltantes:', missingVars);
-    console.error('Por favor, configura las siguientes variables de entorno:');
+    console.warn('⚠️ Variables de entorno faltantes:', missingVars);
+    console.warn('El servidor iniciará en modo de prueba sin Appwrite');
+    console.warn('Para funcionalidad completa, configura las siguientes variables:');
     missingVars.forEach(varName => {
-        console.error(`  - ${varName}`);
+        console.warn(`  - ${varName}`);
     });
-    process.exit(1);
 }
 
 // Middleware
@@ -33,13 +33,22 @@ app.use(cors({
 app.use(express.json());
 
 // Configuración de Appwrite
-const client = new Client();
-client
-    .setEndpoint(process.env.APPWRITE_ENDPOINT || 'https://cloud.appwrite.io/v1')
-    .setProject(process.env.APPWRITE_PROJECT_ID)
-    .setKey(process.env.APPWRITE_API_KEY);
+let client, databases;
+let isAppwriteConfigured = false;
 
-const databases = new Databases(client);
+if (process.env.APPWRITE_PROJECT_ID && process.env.APPWRITE_API_KEY) {
+    client = new Client();
+    client
+        .setEndpoint(process.env.APPWRITE_ENDPOINT || 'https://cloud.appwrite.io/v1')
+        .setProject(process.env.APPWRITE_PROJECT_ID)
+        .setKey(process.env.APPWRITE_API_KEY);
+    
+    databases = new Databases(client);
+    isAppwriteConfigured = true;
+    console.log('✅ Appwrite configurado correctamente');
+} else {
+    console.log('⚠️ Appwrite no configurado - Modo de prueba activado');
+}
 
 // Endpoint para recibir webhooks de Retailbase
 app.post('/webhook/venta', async (req, res) => {
@@ -79,16 +88,21 @@ app.post('/webhook/venta', async (req, res) => {
             rawData: JSON.stringify(ventaData)
         };
 
-        // Guardar en Appwrite
-        const result = await databases.createDocument(
-            process.env.APPWRITE_DATABASE_ID,
-            process.env.APPWRITE_COLLECTION_VENTAS_ID,
-            ID.unique(),
-            ventaDocument
-        );
-
-        console.log('✅ Venta guardada en Appwrite:', result.$id);
-        res.status(200).json({ success: true, documentId: result.$id });
+        if (isAppwriteConfigured) {
+            // Guardar en Appwrite
+            const result = await databases.createDocument(
+                process.env.APPWRITE_DATABASE_ID,
+                process.env.APPWRITE_COLLECTION_VENTAS_ID,
+                ID.unique(),
+                ventaDocument
+            );
+            console.log('✅ Venta guardada en Appwrite:', result.$id);
+            res.status(200).json({ success: true, documentId: result.$id });
+        } else {
+            // Modo de prueba - solo log
+            console.log('✅ Venta procesada (modo prueba):', ventaDocument);
+            res.status(200).json({ success: true, message: 'Venta procesada en modo prueba' });
+        }
 
     } catch (error) {
         console.error('❌ Error procesando webhook:', error);
@@ -101,22 +115,60 @@ app.get('/api/ventas', async (req, res) => {
     try {
         const { limit = 50, offset = 0 } = req.query;
         
-        const result = await databases.listDocuments(
-            process.env.APPWRITE_DATABASE_ID,
-            process.env.APPWRITE_COLLECTION_VENTAS_ID,
-            [
-                // Ordenar por fecha más reciente
-                Query.orderDesc('fechaVenta'),
-                Query.limit(parseInt(limit)),
-                Query.offset(parseInt(offset))
-            ]
-        );
+        if (isAppwriteConfigured) {
+            const result = await databases.listDocuments(
+                process.env.APPWRITE_DATABASE_ID,
+                process.env.APPWRITE_COLLECTION_VENTAS_ID,
+                [
+                    // Ordenar por fecha más reciente
+                    Query.orderDesc('fechaVenta'),
+                    Query.limit(parseInt(limit)),
+                    Query.offset(parseInt(offset))
+                ]
+            );
 
-        res.json({
-            success: true,
-            ventas: result.documents,
-            total: result.total
-        });
+            res.json({
+                success: true,
+                ventas: result.documents,
+                total: result.total
+            });
+        } else {
+            // Modo de prueba - datos de ejemplo
+            const mockVentas = [
+                {
+                    $id: 'test-1',
+                    ventaId: 1001,
+                    fechaVenta: new Date().toISOString(),
+                    folio: 1001,
+                    clienteNombre: 'Cliente de Prueba',
+                    clienteRut: '12345678-9',
+                    totalVenta: 25000,
+                    totalCantidad: 3,
+                    usuario: 'Usuario Sistema',
+                    detalles: JSON.stringify([
+                        {
+                            skuDtv: 'SKU001',
+                            nombreProductoDtv: 'Producto de Prueba',
+                            cantidadProductoDtv: 2,
+                            precioProductoDtv: 10000,
+                            totalProductoDtv: 20000
+                        }
+                    ]),
+                    ingresos: JSON.stringify([
+                        {
+                            glosaInv: 'Efectivo',
+                            montoInv: 25000
+                        }
+                    ])
+                }
+            ];
+
+            res.json({
+                success: true,
+                ventas: mockVentas,
+                total: mockVentas.length
+            });
+        }
 
     } catch (error) {
         console.error('❌ Error obteniendo ventas:', error);
