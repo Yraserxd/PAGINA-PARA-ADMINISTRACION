@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Dashboard de Ventas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-chart-line"></i> Dashboard de Ventas</h1>
+            <div class="header-controls">
+                <button id="refreshBtn" class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+                <div class="date-filter">
+                    <input type="date" id="dateFrom" class="date-input">
+                    <span>hasta</span>
+                    <input type="date" id="dateTo" class="date-input">
+                </div>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="totalVentas">$0</h3>
+                    <p>Total Ventas Hoy</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="cantidadVentas">0</h3>
+                    <p>Ventas Realizadas</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="promedioVenta">$0</h3>
+                    <p>Promedio por Venta</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="ultimaVenta">--:--</h3>
+                    <p>Última Venta</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="table-container">
+                <div class="table-header">
+                    <h2><i class="fas fa-list"></i> Últimas Ventas</h2>
+                    <div class="table-controls">
+                        <input type="text" id="searchInput" placeholder="Buscar por cliente, folio..." class="search-input">
+                        <select id="limitSelect" class="limit-select">
+                            <option value="25">25 registros</option>
+                            <option value="50" selected>50 registros</option>
+                            <option value="100">100 registros</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table class="sales-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Folio</th>
+                                <th>Cliente</th>
+                                <th>Total</th>
+                                <th>Productos</th>
+                                <th>Cajero</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                            <tr>
+                                <td colspan="7" class="loading">
+                                    <i class="fas fa-spinner fa-spin"></i> Cargando ventas...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para detalles de venta -->
+    <div id="ventaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-receipt"></i> Detalle de Venta</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body" id="ventaModalBody">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
