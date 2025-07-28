@@ -48,25 +48,32 @@ app.post('/webhook/venta', async (req, res) => {
         
         const ventaData = req.body;
         
-        // Preparar datos para Appwrite
+        // Log de campos disponibles para debugging
+        console.log('🔍 Campos disponibles en ventaData:');
+        console.log('fechaVentaVnt:', ventaData.fechaVentaVnt);
+        console.log('folioDoc:', ventaData.folioDoc);
+        console.log('nombreClienteVnt:', ventaData.nombreClienteVnt);
+        console.log('totalVentaVnt:', ventaData.totalVentaVnt);
+        
+        // Preparar datos para Appwrite con validación
         const ventaDocument = {
-            ventaId: ventaData.ventaIdPos,
-            empresaId: ventaData.empresaIdCor,
-            sucursalId: ventaData.sucursalIdPos,
-            fechaVenta: new Date(ventaData.fechaVentaVnt),
-            totalVenta: ventaData.totalVentaVnt,
-            totalCantidad: ventaData.totalCantidadVnt,
-            pagoRecibido: ventaData.pagoRecibidoVnt,
-            totalNeto: ventaData.totalNetoVnt,
-            totalDescuento: ventaData.totalDescuentoVnt,
-            clienteRut: ventaData.rutClienteVnt,
-            clienteNombre: ventaData.nombreClienteVnt,
-            usuario: ventaData.nombreUsuarioAppEmpPos,
-            folio: ventaData.folioDoc,
-            token: ventaData.tokenVnt,
-            detalles: JSON.stringify(ventaData.detalles),
-            ingresos: JSON.stringify(ventaData.ingresos),
-            dteReceptor: JSON.stringify(ventaData.dteReceptor),
+            ventaId: ventaData.ventaIdPos || ventaData.ventaId || 0,
+            empresaId: ventaData.empresaIdCor || ventaData.empresaId || 0,
+            sucursalId: ventaData.sucursalIdPos || ventaData.sucursalId || 0,
+            fechaVenta: ventaData.fechaVentaVnt ? new Date(ventaData.fechaVentaVnt) : new Date(),
+            totalVenta: ventaData.totalVentaVnt || ventaData.totalVenta || 0,
+            totalCantidad: ventaData.totalCantidadVnt || ventaData.totalCantidad || 0,
+            pagoRecibido: ventaData.pagoRecibidoVnt || ventaData.pagoRecibido || 0,
+            totalNeto: ventaData.totalNetoVnt || ventaData.totalNeto || 0,
+            totalDescuento: ventaData.totalDescuentoVnt || ventaData.totalDescuento || 0,
+            clienteRut: ventaData.rutClienteVnt || ventaData.clienteRut || 'N/A',
+            clienteNombre: ventaData.nombreClienteVnt || ventaData.clienteNombre || 'Cliente',
+            usuario: ventaData.nombreUsuarioAppEmpPos || ventaData.usuario || 'Usuario',
+            folio: ventaData.folioDoc || ventaData.folio || 0,
+            token: ventaData.tokenVnt || ventaData.token || 'N/A',
+            detalles: JSON.stringify(ventaData.detalles || []),
+            ingresos: JSON.stringify(ventaData.ingresos || []),
+            dteReceptor: JSON.stringify(ventaData.dteReceptor || {}),
             rawData: JSON.stringify(ventaData)
         };
 
