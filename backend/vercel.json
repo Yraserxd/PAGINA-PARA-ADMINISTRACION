@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/server.js"
+    }
+  ],
+  "env": {
+    "APPWRITE_ENDPOINT": "@appwrite_endpoint",
+    "APPWRITE_PROJECT_ID": "@appwrite_project_id",
+    "APPWRITE_API_KEY": "@appwrite_api_key",
+    "APPWRITE_DATABASE_ID": "@appwrite_database_id",
+    "APPWRITE_COLLECTION_VENTAS_ID": "@appwrite_collection_ventas_id"
+  }
+}
