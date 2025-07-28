@@ -62,9 +62,12 @@ app.post('/webhook/venta', async (req, res) => {
         console.log('fechaVentaVnt:', ventaData.fechaVentaVnt);
         console.log('folioDoc:', ventaData.folioDoc);
         console.log('folio:', ventaData.folio);
+        console.log('numeroFolio:', ventaData.numeroFolio);
+        console.log('numeroDocumento:', ventaData.numeroDocumento);
         console.log('nombreClienteVnt:', ventaData.nombreClienteVnt);
         console.log('totalVentaVnt:', ventaData.totalVentaVnt);
         console.log('Todos los campos:', Object.keys(ventaData));
+        console.log('Valor completo de ventaData:', JSON.stringify(ventaData, null, 2));
         
         // Preparar datos para Appwrite con validación
         const ventaDocument = {
@@ -78,9 +81,9 @@ app.post('/webhook/venta', async (req, res) => {
             totalNeto: ventaData.totalNetoVnt || ventaData.totalNeto || 0,
             totalDescuento: ventaData.totalDescuentoVnt || ventaData.totalDescuento || 0,
             clienteRut: ventaData.rutClienteVnt || ventaData.clienteRut || 'N/A',
-            clienteNombre: ventaData.nombreClienteVnt || ventaData.clienteNombre || 'Cliente',
+            clienteNombre: (ventaData.nombreClienteVnt || ventaData.clienteNombre || 'Cliente').replace(/Gen[^\w]*rico/g, 'Genérico'),
             usuario: ventaData.nombreUsuarioAppEmpPos || ventaData.usuario || 'Usuario',
-            folio: ventaData.folioDoc || ventaData.folio || ventaData.numeroFolio || ventaData.numeroDocumento || 0,
+            folio: ventaData.folioDoc || ventaData.folio || ventaData.numeroFolio || ventaData.numeroDocumento || ventaData.folioVenta || ventaData.numeroVenta || ventaData.idVenta || 0,
             token: ventaData.tokenVnt || ventaData.token || 'N/A',
             detalles: JSON.stringify(ventaData.detalles || []),
             ingresos: JSON.stringify(ventaData.ingresos || []),

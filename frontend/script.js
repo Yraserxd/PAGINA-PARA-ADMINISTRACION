@@ -152,17 +152,21 @@ function renderVentas() {
             id: venta.$id,
             fecha: venta.fechaVenta,
             folio: venta.folio,
+            folioType: typeof venta.folio,
             cliente: venta.clienteNombre,
             total: venta.totalVenta
         });
         
+        // Debug: Log completo de la venta
+        console.log('📋 Venta completa:', venta);
+        
         return `
             <tr>
                 <td>${formatDateTime(venta.fechaVenta)}</td>
-                <td><strong>#${venta.folio || 'N/A'}</strong></td>
+                <td><strong>#${venta.folio && venta.folio !== 0 ? venta.folio : 'N/A'}</strong></td>
                 <td>
                     <div>
-                        <strong>${venta.clienteNombre || 'Cliente'}</strong><br>
+                        <strong>${(venta.clienteNombre || 'Cliente').replace(/Gen[^\w]*rico/g, 'Genérico')}</strong><br>
                         <small style="color: #666;">${venta.clienteRut || 'N/A'}</small>
                     </div>
                 </td>
