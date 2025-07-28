@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-    origin: ['https://golden-pony-d5a490.netlify.app', 'http://localhost:3000'],
+    origin: true,
     credentials: true
 }));
 app.use(express.json());
