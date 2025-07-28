@@ -6,6 +6,25 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Validar variables de entorno críticas
+const requiredEnvVars = [
+    'APPWRITE_PROJECT_ID',
+    'APPWRITE_API_KEY',
+    'APPWRITE_DATABASE_ID',
+    'APPWRITE_COLLECTION_VENTAS_ID'
+];
+
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingVars.length > 0) {
+    console.error('❌ Variables de entorno faltantes:', missingVars);
+    console.error('Por favor, configura las siguientes variables de entorno:');
+    missingVars.forEach(varName => {
+        console.error(`  - ${varName}`);
+    });
+    process.exit(1);
+}
+
 // Middleware
 app.use(cors({
     origin: true,
@@ -121,7 +140,29 @@ app.delete('/api/ventas/:id', async (req, res) => {
 
 // Endpoint de salud
 app.get('/health', (req, res) => {
-    res.json({ status: 'OK', timestamp: new Date().toISOString() });
+    res.json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        environment: {
+            port: PORT,
+            appwriteProject: process.env.APPWRITE_PROJECT_ID ? 'Configured' : 'Missing',
+            database: process.env.APPWRITE_DATABASE_ID ? 'Configured' : 'Missing',
+            collection: process.env.APPWRITE_COLLECTION_VENTAS_ID ? 'Configured' : 'Missing'
+        }
+    });
+});
+
+// Endpoint de prueba
+app.get('/', (req, res) => {
+    res.json({ 
+        message: '🚀 Backend de Dashboard de Ventas funcionando',
+        endpoints: {
+            health: '/health',
+            webhook: '/webhook/venta',
+            ventas: '/api/ventas',
+            deleteVenta: '/api/ventas/:id'
+        }
+    });
 });
 
 app.listen(PORT, () => {

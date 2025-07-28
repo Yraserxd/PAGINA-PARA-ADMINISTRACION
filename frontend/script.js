@@ -1,7 +1,11 @@
 // Configuración
 const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3000/api'
+<<<<<<< HEAD
     : 'https://admindonbalato.up.railway.app/api';
+=======
+    : 'https://tu-backend-url.vercel.app/api';
+>>>>>>> 0f46307ddb6f9c04e2c43b3b4a6f3168ddf23adb
 
 // Estado global
 let ventasData = [];
@@ -40,17 +44,24 @@ function setupEventListeners() {
     dateFrom.addEventListener('change', loadVentas);
     dateTo.addEventListener('change', loadVentas);
     
+<<<<<<< HEAD
     // Modal de detalles
+=======
+    // Modal
+>>>>>>> 0f46307ddb6f9c04e2c43b3b4a6f3168ddf23adb
     document.querySelector('.close').addEventListener('click', closeModal);
     window.addEventListener('click', (e) => {
         if (e.target === ventaModal) closeModal();
     });
+<<<<<<< HEAD
     
     // Modal de confirmación
     document.getElementById('confirmDeleteBtn').addEventListener('click', confirmDelete);
     window.addEventListener('click', (e) => {
         if (e.target === document.getElementById('confirmModal')) closeConfirmModal();
     });
+=======
+>>>>>>> 0f46307ddb6f9c04e2c43b3b4a6f3168ddf23adb
 }
 
 async function loadVentas() {
@@ -149,6 +160,7 @@ function renderVentas() {
             <td>${venta.totalCantidad} items</td>
             <td>${venta.usuario}</td>
             <td>
+<<<<<<< HEAD
                 <div class="action-buttons">
                     <button class="btn btn-info btn-small" onclick="showVentaDetail('${venta.$id}')">
                         <i class="fas fa-eye"></i> Ver
@@ -157,6 +169,11 @@ function renderVentas() {
                         <i class="fas fa-trash"></i> Eliminar
                     </button>
                 </div>
+=======
+                <button class="btn btn-info btn-small" onclick="showVentaDetail('${venta.$id}')">
+                    <i class="fas fa-eye"></i> Ver
+                </button>
+>>>>>>> 0f46307ddb6f9c04e2c43b3b4a6f3168ddf23adb
             </td>
         </tr>
     `).join('');
@@ -282,6 +299,7 @@ function formatDateTime(dateString) {
         minute: '2-digit'
     });
 }
+<<<<<<< HEAD
 
 // Variables globales para el modal de confirmación
 let ventaToDelete = null;
@@ -378,3 +396,5 @@ function showNotification(message, type = 'info') {
         }
     }, 5000);
 }
+=======
+>>>>>>> 0f46307ddb6f9c04e2c43b3b4a6f3168ddf23adb

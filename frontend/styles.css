@@ -230,6 +230,7 @@ body {
     background: #2c5282;
 }
 
+<<<<<<< HEAD
 .btn-danger {
     background: #e53e3e;
     color: white;
@@ -324,6 +325,8 @@ body {
     }
 }
 
+=======
+>>>>>>> 0f46307ddb6f9c04e2c43b3b4a6f3168ddf23adb
 /* Modal */
 .modal {
     display: none;
